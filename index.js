@@ -1,7 +1,6 @@
 const express = require('express');
 const mustacheExpress = require('mustache-express');
 const bodyParser = require('body-parser');
-const expressValidator = require('express-validator')
 const app = express();
 
 
@@ -19,9 +18,6 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-// run validator
-app.use(expressValidator());
-
 // todos array
 let todos = [];
 
@@ -29,24 +25,32 @@ let todos = [];
 let completed = [];
 
 // configure root path
-app.get("/", function (req, res) {
+app.get("/", function(req, res) {
   res.render('home', {
-    todos: todos
+    todos: todos,
+    completed: completed
   });
 });
 
 // post new data into array
-app.post("/", function (req, res) {
-    console.log(req.body);
-    todos.push(req.body.todo);
-    res.redirect('/');
+app.post("/", function(req, res) {
+  console.log(req.body);
+  todos.push(req.body.todo);
+  res.redirect('/');
 });
 
 
-app.post("/completed", function (req, res) {
+// separate post event
+app.post("/completed", function(req, res) {
   console.log(req.body);
-    completed.push(req.body.todo);
-    res.redirect('/');
+  for (var i = 0; i < todos.length; i++) {
+    if (req.body.completed === todos[i]) {
+      completed.push(todos[i]);
+      todos.splice(i, 1);
+    }
+
+  }
+  res.redirect('/');
 });
 
 
